@@ -18,6 +18,7 @@ all:
 clean:
 	make -C $(LINUX_KERNEL_PATH) M=$(CURRENT_PATH) clean
 	rm -f ktest
+	rm -f .ksymv
 install:
 	@if [ -n "$(HAVE_MODE)" ]; then \
 		rmmod $(MOD_NAME);\
