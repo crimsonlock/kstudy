@@ -1,20 +1,20 @@
 ### Kstudy
 
-* Kstudy implements "system call" functions in a simple kernel module. 
-* The channel between user space and kernel space is "/dev/kstudy", a virtaul charactor device. 
+* Kstudy implements "system call" functions in a simple kernel module
+* The channel between user space and kernel space is "/dev/kstudy", a virtaul charactor device 
 
 ### Make and install 
 
-* Step1: Modify kstudy/Makefile, change LINUX_KERNEL_PATH := /usr/src/kernels/linux-3.18.137 to your kernel src
+* Step1: Open ./Makefile, change LINUX_KERNEL_PATH := /usr/src/kernels/linux-3.18.137 to your kernel src
 * Step2: make - make kernel module and ktest 
 * Step3: make install - install kernel module
-* clean: make clean
+* Clean: make clean - if you want to clean your kstudy directory before rebuild
 
 ### Usage
 
-* Usage1: kstudy/ktest reg - show registers
-* Usage2: kstudy/ktest superblock - show super_block info
-* Usage3: kstudy/ktest mem {kernel addr in hex} {line num in hex} - inspect kernel mem
+* Usage1: ./ktest reg - show registers
+* Usage2: ./ktest superblock - show super_block info
+* Usage3: ./ktest mem {kernel addr in hex} {line num in hex} - inspect kernel mem
 
 ### Add a new syscall in module
 
