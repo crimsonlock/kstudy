@@ -2,6 +2,9 @@
 
 * Kstudy implements "system call" functions in a simple kernel module
 * The channel between user space and kernel space is "/dev/kstudy", a virtaul charactor device 
+* This program is used only to the beginners of the kernel, for studying purpose only 
+* This program is tested in kernel v3.18.137
+* Kernel source and symbols in: https://elixir.bootlin.com/linux/v3.18.137/source
 
 ### Make and install 
 

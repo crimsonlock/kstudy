@@ -1,13 +1,21 @@
+/**
+ * ktest.c - "syscall" caller in user space
+ *
+ * 2019 Li Shaopeng
+ *
+ */
+
 #include<stdio.h>
 #include<string.h>
+#include "kstudy.h"
 
-#define BUF_SIZE 8192
+//store parameters and return message in user space
+char block[KSTUDY_MSG_SIZE] = { 0 };
 
-char block[BUF_SIZE] = { 0 };
-
+//file pointer
 FILE *fp;
 
-
+//get lower case char code
 int tolower(int c)
 {
 	if (c >= 'A' && c <= 'Z') {
@@ -17,6 +25,7 @@ int tolower(int c)
 	}
 }
 
+//get a decimal value from a hex string
 unsigned long hex2dec(char *s)
 {
 	int i = 0;
@@ -38,6 +47,11 @@ unsigned long hex2dec(char *s)
 	return n;
 }
 
+//get a kernel symbol's addr from /proc/kallsyms,
+//and save it into .ksymv
+//for some symbols in kernel are not allowd to read outside from its definition file
+//this is a simple way to hack kernel variable protection,
+//if you have the right to install your own module into kernel
 unsigned long get_symbol_addr(char *sym){
 	char cmd[50] = {0};
 	char addr[20] = {0};
@@ -52,13 +66,15 @@ unsigned long get_symbol_addr(char *sym){
 	return hex2dec(addr);
 }
 
+//init 8 byte integer params in "block"
+//4 parameters allowed
 void init_param(unsigned long p0, unsigned long p1, unsigned long p2,
 		unsigned long p3)
 {
 
 	unsigned long *cb;
 	cb = (unsigned long *)block;
-	memset(block, 0, BUF_SIZE);
+	memset(block, 0, KSTUDY_MSG_SIZE);
 	cb[0] = p0;
 	cb[1] = p1;
 	cb[2] = p2;
@@ -66,6 +82,9 @@ void init_param(unsigned long p0, unsigned long p1, unsigned long p2,
 
 }
 
+//read mem message in kernel
+//addr - starting addr
+//cnum - max lines (8 byte per line)
 void read_mem_linear(unsigned long addr, unsigned long cnum)
 {
 	int i;
@@ -74,7 +93,7 @@ void read_mem_linear(unsigned long addr, unsigned long cnum)
 	for (i = 0; i < cnum; i += 20) {
 		init_param(0, addr + i * 8, i,
 			   (i + 19) < cnum ? (i + 19) : (cnum - 1));
-		fread(block, 1 , BUF_SIZE, fp);
+		fread(block, 1 , KSTUDY_MSG_SIZE, fp);
 		printf("%s", block);
 	}
 
@@ -82,27 +101,28 @@ void read_mem_linear(unsigned long addr, unsigned long cnum)
 
 }
 
+//read register message
 void read_register()
 {
 
 	init_param(1, 0, 0, 0);
 
 	fp = fopen("/dev/kstudy", "r");
-	fread(block, 1 , BUF_SIZE, fp);
+	fread(block, 1 , KSTUDY_MSG_SIZE, fp);
 	fclose(fp);
 
 	printf("%s", block);
 
 }
 
-
+//read super_blocks message
 void superblock()
 {
-
+	//get the "super_blocks" and "inode_sb_list_lock" addr first
 	init_param(2, get_symbol_addr("super_blocks"), get_symbol_addr("inode_sb_list_lock"), 0);
 
 	fp = fopen("/dev/kstudy", "r");
-	fread(block, 1 , BUF_SIZE, fp);
+	fread(block, 1 , KSTUDY_MSG_SIZE, fp);
 	fclose(fp);
 
 	printf("%s", block);
