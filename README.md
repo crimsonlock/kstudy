@@ -1,6 +1,6 @@
 ### Kstudy
 
-* Kstudy implements "system call" functions in a simple kernel module
+* Kstudy implements "syscall" functions in a simple kernel module
 * The channel between user space and kernel space is "/dev/kstudy", a virtaul charactor device 
 * This program is used only to the beginners of the kernel, for studying purpose only 
 * This program is tested in kernel v3.18.137
@@ -19,9 +19,16 @@
 * Usage2: ./ktest superblock - show super_block info
 * Usage3: ./ktest mem {kernel addr in hex} {line num in hex} - inspect kernel mem
 
-### Add a new syscall in module
+### Add a new "syscall" in module
 
 * Step1: Define {your_call} in kstudy.h
 * Step2: Add entrance in main.c, static ssize_t device_read()
 * Step3: Create {your_call}.c to implement the function
-* Step4: Add caller in ktest.c 
+* Step4: Add caller in ktest.c
+
+### Notice
+
+* The "syscall" above is not really so called syscall
+* We just implement a pesudo syscall through installing a customized kernel module
+* Implementing a new real syscall in kernel is strongly not recommended after version 2.6.x
+* When adding your own "syscall", DO NOT copy message from kernel that may BIGGER than 8192 bytes   
